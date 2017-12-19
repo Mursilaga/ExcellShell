@@ -30,3 +30,12 @@
 *.exe
 *.out
 *.app
+
+*log
+/x64
+/Debug
+/Release
+/ExcellShell/x64
+/ExcellShell/Debug
+/ExcellShell/Release
+ReadMe.txt
