@@ -629,7 +629,7 @@ HRESULT set_bold_range(xls_t * const xls, bool state,int r_since, int c_since, i
 	}
 
 	hr = AutoWrap(DISPATCH_PROPERTYGET, &in, pXlRange, L"Font", 0);
-	AutoWrap(DISPATCH_PROPERTYPUT, 0, in.pdispVal, L"Bold", 1, bold_state);
+	hr = AutoWrap(DISPATCH_PROPERTYPUT, 0, in.pdispVal, L"Bold", 1, bold_state);
 
 	VariantClear(&cell);
 	VariantClear(&in);
@@ -731,8 +731,8 @@ int get_font_color(VARIANT ws, int _r, int _c)
 	VariantInit(&in);
 	VariantInit(&colo);
 
-	while (true) {
-
+	while (true) 
+	{
 		r.lVal = _r;
 		c.lVal = _c;
 		BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &cell, ws.pdispVal, L"Cells", 2, c, r))
@@ -752,6 +752,13 @@ bool get_italic(VARIANT ws, int _r, int _c)
 {
 	bool state;
 	HRESULT hr;
+	hr = get_italic(ws, _r, _c, &state);
+	return state;
+}
+
+HRESULT get_italic(VARIANT ws, int _r, int _c, bool* state)
+{
+	HRESULT hr;
 
 	VARIANT cell;
 	VARIANT r;
@@ -765,21 +772,104 @@ bool get_italic(VARIANT ws, int _r, int _c)
 	VariantInit(&in);
 	VariantInit(&italic);
 
-	while (true) {
-
+	while (true)
+	{
 		r.lVal = _r;
 		c.lVal = _c;
 		BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &cell, ws.pdispVal, L"Cells", 2, c, r))
-			BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &in, cell.pdispVal, L"Font", 0))
-			BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &italic, in.pdispVal, L"Italic", 0))
-			state = italic.boolVal;
+		BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &in, cell.pdispVal, L"Font", 0))
+		BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &italic, in.pdispVal, L"Italic", 0))
+		*state = italic.boolVal;
 		break;
 	}
 
 	VariantClear(&cell);
 	VariantClear(&in);
 
-	return state;
+	return hr;
+}
+
+HRESULT set_italic(VARIANT ws, int _r, int _c, bool state)
+{
+	HRESULT hr;
+
+	VARIANT cell;
+	VARIANT r;
+	VARIANT c;
+	VARIANT in;
+	VARIANT italic;
+
+	VariantInit(&cell);
+	r.vt = VT_I4;
+	c.vt = VT_I4;
+	VariantInit(&in);
+	italic.vt = VT_I4;
+	italic.lVal = state;
+
+	while (true)
+	{
+		r.lVal = _r;
+		c.lVal = _c;
+		BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &cell, ws.pdispVal, L"Cells", 2, c, r))
+		BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &in, cell.pdispVal, L"Font", 0))
+		BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYPUT, 0, in.pdispVal, L"Italic", 1, italic))
+		break;
+	}
+
+	VariantClear(&cell);
+	VariantClear(&in);
+
+	return hr;
+}
+
+HRESULT set_italic_range(xls_t * const xls, int r_since, int c_since, int r_before, int c_before, bool state)
+{
+	std::wstring range = get_cell(r_since, c_since);
+	range += L":";
+	range += get_cell(r_before, c_before);
+
+	HRESULT hr;
+
+	VARIANT cell;
+	VARIANT in;
+	VARIANT italic_state;
+	VariantInit(&in);
+	italic_state.vt = VT_BOOL;
+	italic_state.boolVal = state;
+
+	while (true)
+	{
+		IDispatch *pXlSheet;
+		{
+			VARIANT result;
+			VariantInit(&result);
+			BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &result, xls->app.pdispVal, L"ActiveSheet", 0))
+			pXlSheet = result.pdispVal;
+		}
+
+		IDispatch *pXlRange;
+		{
+			VARIANT parm;
+			parm.vt = VT_BSTR;
+			parm.bstrVal = ::SysAllocString(range.c_str());
+
+			VARIANT result;
+			VariantInit(&result);
+			BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &result, pXlSheet, L"Range", 1, parm))
+			VariantClear(&parm);
+
+			pXlRange = result.pdispVal;
+		}
+
+		BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &in, pXlRange, L"Font", 0))
+		BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYPUT, 0, in.pdispVal, L"Italic", 1, italic_state))
+		break;
+	}
+
+	VariantClear(&cell);
+	VariantClear(&in);
+
+	return hr;
 }
 
 bool get_bold(VARIANT ws, int _r, int _c)
@@ -799,14 +889,14 @@ bool get_bold(VARIANT ws, int _r, int _c)
 	VariantInit(&in);
 	VariantInit(&bold);
 
-	while (true) {
-
+	while (true) 
+	{
 		r.lVal = _r;
 		c.lVal = _c;
 		BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &cell, ws.pdispVal, L"Cells", 2, c, r))
-			BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &in, cell.pdispVal, L"Font", 0))
-			BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &bold, in.pdispVal, L"Bold", 0))
-			state = bold.boolVal;
+		BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &in, cell.pdispVal, L"Font", 0))
+		BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &bold, in.pdispVal, L"Bold", 0))
+		state = bold.boolVal;
 		break;
 	}
 

@@ -81,6 +81,10 @@ HRESULT set_font_color(VARIANT ws, int _r, int _c, const int x);
 HRESULT set_font_color_range(xls_t * const xls, int r_since, int c_since, int r_before, int c_before, const int x);
 
 bool get_italic(VARIANT ws, int _r, int _c);
+HRESULT get_italic(VARIANT ws, int _r, int _c, bool* state);
+HRESULT set_italic(VARIANT ws, int _r, int _c, bool state);
+HRESULT set_italic_range(xls_t * const xls, int r_since, int c_since, int r_before, int c_before, bool state);
+
 bool get_bold(VARIANT ws, int _r, int _c);
 HRESULT set_bold_range(xls_t * const xls, bool state, int r_since, int c_since, int r_before, int c_before);
 
