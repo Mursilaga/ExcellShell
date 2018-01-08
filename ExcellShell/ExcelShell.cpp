@@ -394,7 +394,7 @@ HRESULT write(xls_t * const xls, int _r, int _c, std::wstring wstr)
 	return hr;
 }
 
-HRESULT set_color(VARIANT ws, int _r, int _c, const int x)
+HRESULT set_inter_color(VARIANT ws, int _r, int _c, const int x)
 {
 	HRESULT hr;
 
