@@ -394,52 +394,6 @@ HRESULT write(xls_t * const xls, int _r, int _c, std::wstring wstr)
 	return hr;
 }
 
-HRESULT set_font_color_range(xls_t * const xls, int r_since, int c_since, int r_before, int c_before, const int x)
-{
-	std::wstring range = get_cell(r_since, c_since);
-	range += L":";
-	range += get_cell(r_before, c_before);
-
-	HRESULT hr;
-
-	VARIANT cell;
-	VARIANT in;
-	VARIANT co;
-	VariantInit(&in);
-	co.vt = VT_I4;
-	co.lVal = x;
-
-	IDispatch *pXlSheet;
-	{
-		VARIANT result;
-		VariantInit(&result);
-		AutoWrap(DISPATCH_PROPERTYGET, &result, xls->app.pdispVal, L"ActiveSheet", 0);
-		pXlSheet = result.pdispVal;
-	}
-
-	IDispatch *pXlRange;
-	{
-		VARIANT parm;
-		parm.vt = VT_BSTR;
-		parm.bstrVal = ::SysAllocString(range.c_str());
-
-		VARIANT result;
-		VariantInit(&result);
-		AutoWrap(DISPATCH_PROPERTYGET, &result, pXlSheet, L"Range", 1, parm);
-		VariantClear(&parm);
-
-		pXlRange = result.pdispVal;
-	}
-
-	hr = AutoWrap(DISPATCH_PROPERTYGET, &in, pXlRange, L"Font", 0);
-	AutoWrap(DISPATCH_PROPERTYPUT, 0, in.pdispVal, L"Color", 1, co);
-
-	VariantClear(&cell);
-	VariantClear(&in);
-
-	return hr;
-}
-
 std::wstring get_cell(int r, int c)
 {
 	std::wstring symb_for_excel[MAX_COLUMN + 1] = { L"", L"a", L"b", L"c", L"d", L"e", L"f", L"g", L"h", L"i", L"j", L"k", L"l", L"m", L"n", L"o", L"p", L"q", L"r", L"s", L"t", L"u", L"v", L"w", L"x", L"y", L"z", L"aa", L"ab", L"ac", L"ad", L"ae", L"af", L"ag", L"ah", L"ai", L"aj", L"ak", L"al", L"am", L"an" };
@@ -449,90 +403,29 @@ std::wstring get_cell(int r, int c)
 	return res;
 }
 
-HRESULT set_font_color(VARIANT ws, int _r, int _c, const int x)
-{
-	HRESULT hr;
-
-	VARIANT cell;
-	VARIANT r;
-	VARIANT c;
-	VARIANT in;
-	VARIANT co;
-
-	VariantInit(&cell);
-	r.vt = VT_I4;
-	c.vt = VT_I4;
-	VariantInit(&in);
-	co.vt = VT_I4;
-	co.lVal = x;
-
-	while (true) {
-
-		r.lVal = _r;
-		c.lVal = _c;
-		BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &cell, ws.pdispVal, L"Cells", 2, c, r))
-			BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &in, cell.pdispVal, L"Font", 0))
-			BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYPUT, 0, in.pdispVal, L"Color", 1, co))
-			break;
-	}
-
-
-	VariantClear(&cell);
-	VariantClear(&in);
-
-	return hr;
-}
-
-HRESULT get_font_color(VARIANT ws, int _r, int _c, int *x)
-{
-	HRESULT hr;
-
-	VARIANT cell;
-	VARIANT r;
-	VARIANT c;
-	VARIANT in;
-	VARIANT colo;
-
-	VariantInit(&cell);
-	r.vt = VT_I4;
-	c.vt = VT_I4;
-	VariantInit(&in);
-	VariantInit(&colo);
-
-	while (true) {
-
-		r.lVal = _r;
-		c.lVal = _c;
-		BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &cell, ws.pdispVal, L"Cells", 2, c, r))
-			BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &in, cell.pdispVal, L"Font", 0))
-			BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &colo, in.pdispVal, L"Color", 0))
-			*x = colo.dblVal;
-		break;
-	}
-
-	VariantClear(&cell);
-	VariantClear(&in);
-
-	return hr;
-}
-
 int get_font_color(VARIANT ws, int _r, int _c)
 {
+	int color;
+	HRESULT hr;
+	hr = get_font_color(ws, _r, _c, &color);
+	return color;
+}
+
+HRESULT get_font_color(VARIANT ws, int _r, int _c, int *color_value)
+{
 	HRESULT hr;
 
 	VARIANT cell;
 	VARIANT r;
 	VARIANT c;
 	VARIANT in;
-	VARIANT colo;
-
-	int x;
+	VARIANT color;
 
 	VariantInit(&cell);
 	r.vt = VT_I4;
 	c.vt = VT_I4;
 	VariantInit(&in);
-	VariantInit(&colo);
+	VariantInit(&color);
 
 	while (true) 
 	{
@@ -540,15 +433,98 @@ int get_font_color(VARIANT ws, int _r, int _c)
 		c.lVal = _c;
 		BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &cell, ws.pdispVal, L"Cells", 2, c, r))
 		BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &in, cell.pdispVal, L"Font", 0))
-		BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &colo, in.pdispVal, L"Color", 0))
-		x = colo.dblVal;
+		BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &color, in.pdispVal, L"Color", 0))
+		*color_value = color.dblVal;
 		break;
 	}
 
 	VariantClear(&cell);
 	VariantClear(&in);
 
-	return x;
+	return hr;
+}
+
+HRESULT set_font_color(VARIANT ws, int _r, int _c, const int color_value)
+{
+	HRESULT hr;
+
+	VARIANT cell;
+	VARIANT r;
+	VARIANT c;
+	VARIANT in;
+	VARIANT color;
+
+	VariantInit(&cell);
+	r.vt = VT_I4;
+	c.vt = VT_I4;
+	VariantInit(&in);
+	color.vt = VT_I4;
+	color.lVal = color_value;
+
+	while (true)
+	{
+		r.lVal = _r;
+		c.lVal = _c;
+		BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &cell, ws.pdispVal, L"Cells", 2, c, r))
+		BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &in, cell.pdispVal, L"Font", 0))
+		BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYPUT, 0, in.pdispVal, L"Color", 1, color))
+		break;
+	}
+
+	VariantClear(&cell);
+	VariantClear(&in);
+
+	return hr;
+}
+
+HRESULT set_font_color_range(xls_t * const xls, int r_since, int c_since, int r_before, int c_before, const int color_value)
+{
+	std::wstring range = get_cell(r_since, c_since);
+	range += L":";
+	range += get_cell(r_before, c_before);
+
+	HRESULT hr;
+
+	VARIANT cell;
+	VARIANT in;
+	VARIANT color;
+	VariantInit(&in);
+	color.vt = VT_I4;
+	color.lVal = color_value;
+
+	while (true)
+	{
+		IDispatch *pXlSheet;
+		{
+			VARIANT result;
+			VariantInit(&result);
+			BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &result, xls->app.pdispVal, L"ActiveSheet", 0))
+			pXlSheet = result.pdispVal;
+		}
+
+		IDispatch *pXlRange;
+		{
+			VARIANT parm;
+			parm.vt = VT_BSTR;
+			parm.bstrVal = ::SysAllocString(range.c_str());
+
+			VARIANT result;
+			VariantInit(&result);
+			BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &result, pXlSheet, L"Range", 1, parm))
+			VariantClear(&parm);
+
+			pXlRange = result.pdispVal;
+		}
+
+		BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &in, pXlRange, L"Font", 0))
+		BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYPUT, 0, in.pdispVal, L"Color", 1, color))
+		break;
+	}
+
+	VariantClear(&cell);
+	VariantClear(&in);
+
+	return hr;
 }
 
 int get_inter_color(VARIANT ws, int _r, int _c)

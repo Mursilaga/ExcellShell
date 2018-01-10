@@ -13,7 +13,7 @@ int main()
 	//write std::wstring in any cell
 	hr = write(xls, 1, B_COLUMN, L"test");
 
-	//set bold in B1 cell. For italic is the same 
+	//set bold in B1 cell. For italic is similar 
 	hr = set_bold(xls->ws, 1, B_COLUMN, true);
 	//set bold in range of cells
 	hr = set_bold_range(xls, 5, A_COLUMN, 10, B_COLUMN, true);
@@ -26,7 +26,7 @@ int main()
 	std::cout << "bold in B5 is " << boldState << std::endl;
 	
 
-	//set interior color
+	//set interior color. For inter color is similar
 	hr = set_inter_color(xls->ws, 1, B_COLUMN, GRAY);
 	//set interior color in range of cells
 	hr = set_inter_color_range(xls, 5, A_COLUMN, 10, B_COLUMN, LIGHT_BROWN);
