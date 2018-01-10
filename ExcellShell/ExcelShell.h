@@ -74,9 +74,9 @@ int read_int(VARIANT ws, int _r, int _c);
 HRESULT write(xls_t * const xls, int _r, int _c, std::wstring wstr);
 
 int get_inter_color(VARIANT ws, int _r, int _c);
-HRESULT get_inter_color(VARIANT ws, int _r, int _c, int *color);
-HRESULT set_inter_color(VARIANT ws, int _r, int _c, const int color);
-HRESULT set_inter_color_range(xls_t * const xls, int r_since, int c_since, int r_before, int c_before, const int color);
+HRESULT get_inter_color(VARIANT ws, int _r, int _c, int *color_value);
+HRESULT set_inter_color(VARIANT ws, int _r, int _c, const int color_value);
+HRESULT set_inter_color_range(xls_t * const xls, int r_since, int c_since, int r_before, int c_before, const int color_value);
 
 int get_font_color(VARIANT ws, int _r, int _c);
 HRESULT get_font_color(VARIANT ws, int _r, int _c, int *x);
