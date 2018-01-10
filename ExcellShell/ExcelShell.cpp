@@ -591,52 +591,6 @@ int get_inter_color(VARIANT ws, int _r, int _c)
 	return x;
 }
 
-HRESULT set_bold_range(xls_t * const xls, bool state,int r_since, int c_since, int r_before, int c_before)
-{
-	std::wstring range = get_cell(r_since, c_since);
-	range += L":";
-	range += get_cell(r_before, c_before);
-
-	HRESULT hr;
-
-	VARIANT cell;
-	VARIANT in;
-	VARIANT bold_state;
-	VariantInit(&in);
-	bold_state.vt = VT_BOOL;
-	bold_state.boolVal = state;
-
-	IDispatch *pXlSheet;
-	{
-		VARIANT result;
-		VariantInit(&result);
-		AutoWrap(DISPATCH_PROPERTYGET, &result, xls->app.pdispVal, L"ActiveSheet", 0);
-		pXlSheet = result.pdispVal;
-	}
-
-	IDispatch *pXlRange;
-	{
-		VARIANT parm;
-		parm.vt = VT_BSTR;
-		parm.bstrVal = ::SysAllocString(range.c_str());
-
-		VARIANT result;
-		VariantInit(&result);
-		AutoWrap(DISPATCH_PROPERTYGET, &result, pXlSheet, L"Range", 1, parm);
-		VariantClear(&parm);
-
-		pXlRange = result.pdispVal;
-	}
-
-	hr = AutoWrap(DISPATCH_PROPERTYGET, &in, pXlRange, L"Font", 0);
-	hr = AutoWrap(DISPATCH_PROPERTYPUT, 0, in.pdispVal, L"Bold", 1, bold_state);
-
-	VariantClear(&cell);
-	VariantClear(&in);
-
-	return hr;
-}
-
 std::wstring get_cell(int r, int c)
 {
 	std::wstring symb_for_excel[MAX_COLUMN + 1] = { L"", L"a", L"b", L"c", L"d", L"e", L"f", L"g", L"h", L"i", L"j", L"k", L"l", L"m", L"n", L"o", L"p", L"q", L"r", L"s", L"t", L"u", L"v", L"w", L"x", L"y", L"z", L"aa", L"ab", L"ac", L"ad", L"ae", L"af", L"ag", L"ah", L"ai", L"aj", L"ak", L"al", L"am", L"an" };
@@ -876,6 +830,13 @@ bool get_bold(VARIANT ws, int _r, int _c)
 {
 	bool state;
 	HRESULT hr;
+	hr = get_bold(ws, _r, _c, &state);
+	return state;
+}
+
+HRESULT get_bold(VARIANT ws, int _r, int _c, bool* state)
+{
+	HRESULT hr;
 
 	VARIANT cell;
 	VARIANT r;
@@ -889,21 +850,104 @@ bool get_bold(VARIANT ws, int _r, int _c)
 	VariantInit(&in);
 	VariantInit(&bold);
 
-	while (true) 
+	while (true)
 	{
 		r.lVal = _r;
 		c.lVal = _c;
 		BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &cell, ws.pdispVal, L"Cells", 2, c, r))
 		BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &in, cell.pdispVal, L"Font", 0))
 		BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &bold, in.pdispVal, L"Bold", 0))
-		state = bold.boolVal;
+		*state = bold.boolVal;
 		break;
 	}
 
 	VariantClear(&cell);
 	VariantClear(&in);
 
-	return state;
+	return hr;
+}
+
+HRESULT set_bold(VARIANT ws, int _r, int _c, bool state)
+{
+	HRESULT hr;
+
+	VARIANT cell;
+	VARIANT r;
+	VARIANT c;
+	VARIANT in;
+	VARIANT bold;
+
+	VariantInit(&cell);
+	r.vt = VT_I4;
+	c.vt = VT_I4;
+	VariantInit(&in);
+	bold.vt = VT_I4;
+	bold.lVal = state;
+
+	while (true)
+	{
+		r.lVal = _r;
+		c.lVal = _c;
+		BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &cell, ws.pdispVal, L"Cells", 2, c, r))
+		BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &in, cell.pdispVal, L"Font", 0))
+		BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYPUT, 0, in.pdispVal, L"Bold", 1, bold))
+		break;
+	}
+
+	VariantClear(&cell);
+	VariantClear(&in);
+
+	return hr;
+}
+
+HRESULT set_bold_range(xls_t * const xls, int r_since, int c_since, int r_before, int c_before, bool state)
+{
+	std::wstring range = get_cell(r_since, c_since);
+	range += L":";
+	range += get_cell(r_before, c_before);
+
+	HRESULT hr;
+
+	VARIANT cell;
+	VARIANT in;
+	VARIANT bold_state;
+	VariantInit(&in);
+	bold_state.vt = VT_BOOL;
+	bold_state.boolVal = state;
+
+	while (true)
+	{
+		IDispatch *pXlSheet;
+		{
+			VARIANT result;
+			VariantInit(&result);
+			BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &result, xls->app.pdispVal, L"ActiveSheet", 0))
+			pXlSheet = result.pdispVal;
+		}
+
+		IDispatch *pXlRange;
+		{
+			VARIANT parm;
+			parm.vt = VT_BSTR;
+			parm.bstrVal = ::SysAllocString(range.c_str());
+
+			VARIANT result;
+			VariantInit(&result);
+			BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &result, pXlSheet, L"Range", 1, parm))
+			VariantClear(&parm);
+
+			pXlRange = result.pdispVal;
+		}
+
+		BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &in, pXlRange, L"Font", 0))
+		BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYPUT, 0, in.pdispVal, L"Bold", 1, bold_state))
+		break;
+	}
+
+	VariantClear(&cell);
+	VariantClear(&in);
+
+	return hr;
 }
 
 void erase_range(xls_t * const xls, int r_since, int c_since, int r_before, int c_before)

@@ -34,16 +34,19 @@ enum columns
 	AZ_COLUMN
 };
 
-#define BLACK 0x0
-#define WHITE 0xFFFFFF
-#define DARK_GREEN 0x008000
-#define BROWN 0xC3C83
-#define BLUE 0xFF0000
-#define GRAY 14277081
-#define RED 0x0000FF
-#define LIGHT_BROWN 8696052
-#define PINK 13408767
-#define CREAM 0xADCBF8
+enum colors
+{
+	BLACK = 0x0,
+	WHITE = 0xFFFFFF,
+	DARK_GREEN = 0x008000,
+	BROWN = 0xC3C83,
+	BLUE = 0xFF0000,
+	GRAY = 14277081,
+	RED = 0x0000FF,
+	LIGHT_BROWN = 8696052,
+	PINK = 13408767,
+	CREAM = 0xADCBF8
+};
 
 struct xls_t
 {
@@ -86,7 +89,9 @@ HRESULT set_italic(VARIANT ws, int _r, int _c, bool state);
 HRESULT set_italic_range(xls_t * const xls, int r_since, int c_since, int r_before, int c_before, bool state);
 
 bool get_bold(VARIANT ws, int _r, int _c);
-HRESULT set_bold_range(xls_t * const xls, bool state, int r_since, int c_since, int r_before, int c_before);
+HRESULT get_bold(VARIANT ws, int _r, int _c, bool* state);
+HRESULT set_bold(VARIANT ws, int _r, int _c, bool state);
+HRESULT set_bold_range(xls_t * const xls, int r_since, int c_since, int r_before, int c_before, bool state);
 
 std::wstring get_cell(int r, int c);
 
