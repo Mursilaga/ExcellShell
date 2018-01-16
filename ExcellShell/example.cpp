@@ -10,8 +10,16 @@ int main()
 	xls_t *xls = new xls_t;
 	hr = proc_beg(path, xls);
 
-	//write std::wstring in any cell
-	hr = write(xls, 1, B_COLUMN, L"test");
+	//write in any cell
+	char * char_str = "char";
+	wchar_t *wchar_str = L"wchar_t";
+	std::string str = "string";
+	std::wstring wstr = L"wstring";
+
+	hr = write(xls, 1, B_COLUMN, char_str);
+	hr = write(xls, 1, C_COLUMN, wchar_str);
+	hr = write(xls, 1, D_COLUMN, str);
+	hr = write(xls, 1, E_COLUMN, wstr);
 
 	//set bold in B1 cell. For italic is similar 
 	hr = set_bold(xls->ws, 1, B_COLUMN, true);

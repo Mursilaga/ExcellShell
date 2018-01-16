@@ -335,58 +335,63 @@ int read_int(VARIANT ws, int row, int col)
 	return cell_int;
 }
 
+HRESULT write(xls_t * const xls, int _r, int _c, char* char_str)
+{
+	const size_t size = strlen(char_str) + 1;
+	wchar_t* wchar_str = new wchar_t[size];
+	mbstowcs(wchar_str, char_str, size);
+	return write(xls, _r, _c, wchar_str);
+}
+
+HRESULT write(xls_t * const xls, int _r, int _c, std::string str)
+{
+	return write(xls, _r, _c, std::wstring(str.begin(), str.end()));
+}
+
 HRESULT write(xls_t * const xls, int _r, int _c, std::wstring wstr)
+{
+	wchar_t *wchar_str = (wchar_t *)wstr.c_str();
+	return write(xls, _r, _c, wchar_str);
+}
+
+HRESULT write(xls_t * const xls, int _r, int _c, wchar_t* wchar_str)
 {
 	HRESULT hr = NULL;
 
 	VariantInit(&xls->app);
-	VariantInit(&xls->wbs);
-	VariantInit(&xls->wb);
-	VariantInit(&xls->wss);
-	VariantInit(&xls->ws);
-
-
-	VARIANT arr;
-	arr.vt = VT_ARRAY | VT_VARIANT;
-	{
-		SAFEARRAYBOUND sab[1];
-		sab[0].lLbound = 1; sab[0].cElements = 1;
-		arr.parray = SafeArrayCreate(VT_VARIANT, 1, sab);
-	}
 
 	VARIANT tmp;
 	tmp.vt = VT_BSTR;
-	tmp.bstrVal = ::SysAllocString(wstr.c_str());
+	tmp.bstrVal = ::SysAllocString(wchar_str);
 
-	long indices[] = { 1, 1 };
-	SafeArrayPutElement(arr.parray, indices, (void *)&tmp);
-
-	// Get ActiveSheet object
-	IDispatch *pXlSheet;
+	while (true)
 	{
-		VARIANT result;
-		VariantInit(&result);
-		AutoWrap(DISPATCH_PROPERTYGET, &result, xls->app.pdispVal, L"ActiveSheet", 0);
-		pXlSheet = result.pdispVal;
+		IDispatch *pXlSheet;
+		{
+			VARIANT result;
+			VariantInit(&result);
+			BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &result, xls->app.pdispVal, L"ActiveSheet", 0))
+			pXlSheet = result.pdispVal;
+		}
+
+		IDispatch *pXlRange;
+		{
+			std::wstring cell = get_cell(_r, _c);
+			VARIANT parm;
+			parm.vt = VT_BSTR;
+			parm.bstrVal = ::SysAllocString(cell.c_str());
+
+			VARIANT result;
+			VariantInit(&result);
+			BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &result, pXlSheet, L"Range", 1, parm))
+			VariantClear(&parm);
+
+			pXlRange = result.pdispVal;
+		}
+
+		BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYPUT, NULL, pXlRange, L"Value", 1, tmp))
+		break;
 	}
-
-	IDispatch *pXlRange;
-	{
-		std::wstring cell = get_cell(_r, _c);
-		VARIANT parm;
-		parm.vt = VT_BSTR;
-		parm.bstrVal = ::SysAllocString(cell.c_str());
-
-		VARIANT result;
-		VariantInit(&result);
-		AutoWrap(DISPATCH_PROPERTYGET, &result, pXlSheet, L"Range", 1, parm);
-		VariantClear(&parm);
-
-		pXlRange = result.pdispVal;
-	}
-
-	// Set range with our safearray...
-	AutoWrap(DISPATCH_PROPERTYPUT, NULL, pXlRange, L"Value", 1, arr);
 	return hr;
 }
 
