@@ -65,7 +65,7 @@ std::string wstr_to_str(const std::wstring &s, const unsigned cp = CP_ACP);
 HRESULT proc_beg(const std::wstring &path, xls_t * const xls, bool visible = true); //open if path.size() != 0 or add if path.size() == 0
 HRESULT proc_end(HRESULT hr, xls_t * const xls, bool save = true, bool close = true);
 
-HRESULT activate_sheet(xls_t * const xls, int sheetnum);
+HRESULT activate_sheet(xls_t * const xls, int sheet_num);
 
 HRESULT read(VARIANT ws, int _r, int _c, std::wstring * const _x);
 HRESULT read_formula(VARIANT ws, int _r, int _c, std::wstring * const _x);

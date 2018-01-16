@@ -173,7 +173,7 @@ HRESULT proc_end(HRESULT hr, xls_t * const xls, bool save, bool close)
 	return hr;
 }
 
-HRESULT activate_sheet(xls_t * const xls, int sheetnum)
+HRESULT activate_sheet(xls_t * const xls, int sheet_num)
 {
 	HRESULT hr = NULL;
 	VARIANT result;
@@ -181,28 +181,24 @@ HRESULT activate_sheet(xls_t * const xls, int sheetnum)
 
 	VARIANT parm;
 	parm.vt = VT_I4;
-	parm.lVal = sheetnum; //activate sheet
-
-	hr = AutoWrap(DISPATCH_PROPERTYGET, &xls->ws, xls->wss.pdispVal, L"Item", 1, parm);
-	if (FAILED(hr))
-		std::cout << "name failed" << std::endl;
-	else std::cout << "name succeded" << std::endl;
-
+	parm.lVal = sheet_num;
+	while (true)
 	{
-		VARIANT result;
-		VariantInit(&result);
-		AutoWrap(DISPATCH_METHOD, &result, xls->ws.pdispVal, L"Activate", 0);
-		if (FAILED(hr))
-			std::cout << "select failed" << std::endl;
-		else std::cout << "select succeded" << std::endl;
-	}
+		BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &xls->ws, xls->wss.pdispVal, L"Item", 1, parm))
+		{
+			VARIANT result;
+			VariantInit(&result);
+			BREAK_ON_FAIL(AutoWrap(DISPATCH_METHOD, &result, xls->ws.pdispVal, L"Activate", 0))
+		}
 
-	IDispatch *pXlSheet;
-	{
-		VARIANT result;
-		VariantInit(&result);
-		AutoWrap(DISPATCH_PROPERTYGET, &result, xls->app.pdispVal, L"ActiveSheet", 0);
-		pXlSheet = result.pdispVal;
+		IDispatch *pXlSheet;
+		{
+			VARIANT result;
+			VariantInit(&result);
+			BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &result, xls->app.pdispVal, L"ActiveSheet", 0))
+			pXlSheet = result.pdispVal;
+		}
+		break;
 	}
 	return hr;
 }
@@ -920,29 +916,33 @@ void erase_range(xls_t * const xls, int r_since, int c_since, int r_before, int 
 		arr.parray = SafeArrayCreate(VT_VARIANT, 1, sab);
 	}
 
-	IDispatch *pXlSheet;
+	while (true)
 	{
-		VARIANT result;
-		VariantInit(&result);
-		AutoWrap(DISPATCH_PROPERTYGET, &result, xls->app.pdispVal, L"ActiveSheet", 0);
-		pXlSheet = result.pdispVal;
+		IDispatch *pXlSheet;
+		{
+			VARIANT result;
+			VariantInit(&result);
+			BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &result, xls->app.pdispVal, L"ActiveSheet", 0))
+			pXlSheet = result.pdispVal;
+		}
+
+		IDispatch *pXlRange;
+		{
+			VARIANT parm;
+			parm.vt = VT_BSTR;
+			parm.bstrVal = ::SysAllocString(range.c_str());
+
+			VARIANT result;
+			VariantInit(&result);
+			BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &result, pXlSheet, L"Range", 1, parm))
+			VariantClear(&parm);
+
+			pXlRange = result.pdispVal;
+		}
+
+		BREAK_ON_FAIL(AutoWrap(DISPATCH_METHOD, NULL, pXlRange, L"ClearContents", 0))
+		break;
 	}
-
-	IDispatch *pXlRange;
-	{
-		VARIANT parm;
-		parm.vt = VT_BSTR;
-		parm.bstrVal = ::SysAllocString(range.c_str());
-
-		VARIANT result;
-		VariantInit(&result);
-		AutoWrap(DISPATCH_PROPERTYGET, &result, pXlSheet, L"Range", 1, parm);
-		VariantClear(&parm);
-
-		pXlRange = result.pdispVal;
-	}
-
-	hr = AutoWrap(DISPATCH_METHOD, NULL, pXlRange, L"ClearContents", 0);
 }
 
 HRESULT read_formula(VARIANT ws, int _r, int _c, std::wstring * const _x)
