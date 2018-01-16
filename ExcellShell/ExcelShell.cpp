@@ -339,7 +339,26 @@ int read_int(VARIANT ws, int row, int col)
 	return cell_int;
 }
 
+HRESULT write(xls_t * const xls, int _r, int _c, char* char_str)
+{
+	const size_t size = strlen(char_str) + 1;
+	wchar_t* wchar_str = new wchar_t[size];
+	mbstowcs(wchar_str, char_str, size);
+	return write(xls, _r, _c, wchar_str);
+}
+
+HRESULT write(xls_t * const xls, int _r, int _c, std::string str)
+{
+	return write(xls, _r, _c, std::wstring(str.begin(), str.end()));
+}
+
 HRESULT write(xls_t * const xls, int _r, int _c, std::wstring wstr)
+{
+	wchar_t *wchar_str = (wchar_t *)wstr.c_str();
+	return write(xls, _r, _c, wchar_str);
+}
+
+HRESULT write(xls_t * const xls, int _r, int _c, wchar_t* wchar_str)
 {
 	HRESULT hr = NULL;
 
@@ -347,7 +366,7 @@ HRESULT write(xls_t * const xls, int _r, int _c, std::wstring wstr)
 
 	VARIANT tmp;
 	tmp.vt = VT_BSTR;
-	tmp.bstrVal = ::SysAllocString(wstr.c_str());
+	tmp.bstrVal = ::SysAllocString(wchar_str);
 
 	while (true)
 	{

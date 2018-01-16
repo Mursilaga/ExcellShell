@@ -66,7 +66,10 @@ HRESULT read(VARIANT ws, int _r, int _c, std::wstring * const _x);
 HRESULT read_formula(VARIANT ws, int _r, int _c, std::wstring * const _x);
 int read_int(VARIANT ws, int _r, int _c);
 
+HRESULT write(xls_t * const xls, int _r, int _c, std::string str);
 HRESULT write(xls_t * const xls, int _r, int _c, std::wstring wstr);
+HRESULT write(xls_t * const xls, int _r, int _c, char* char_str);
+HRESULT write(xls_t * const xls, int _r, int _c, wchar_t* wchar_str);
 
 int get_font_color(VARIANT ws, int _r, int _c);
 HRESULT get_font_color(VARIANT ws, int _r, int _c, int *color_value);
