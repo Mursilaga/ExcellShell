@@ -88,9 +88,9 @@ HRESULT proc_beg(const std::wstring &path, xls_t * const xls, bool visible)
 
 	// Make it visible/invisible 
 	x.vt = VT_I4;
-	x.lVal = VISIBLE;
+	x.boolVal = visible;
 	AutoWrap(DISPATCH_PROPERTYPUT, NULL, xls->app.pdispVal, L"Visible", 1, x);
-	if (VISIBLE)
+	if (visible)
 		std::cout << "excel was opened visible" << std::endl;
 	else std::cout << "excel was opened invisible" << std::endl;
 

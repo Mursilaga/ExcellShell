@@ -11,7 +11,6 @@
 
 #define BREAK_ON_FAIL(x) if (FAILED(hr = x)) break;
 #define MAX_COLUMN 40
-#define VISIBLE 1 //app.visible = 1, invisible = 0;
 
 enum columns
 {
