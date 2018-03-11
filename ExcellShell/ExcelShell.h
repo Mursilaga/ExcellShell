@@ -69,10 +69,14 @@ namespace xlsh
 	HRESULT read_formula(VARIANT ws, int _r, int _c, std::wstring * const _x);
 	int read_int(VARIANT ws, int _r, int _c);
 
+	HRESULT write(xls_t * const xls, int _r, int _c, int value);
+	HRESULT write(xls_t * const xls, int _r, int _c, float value);
+	HRESULT write(xls_t * const xls, int _r, int _c, double value);
 	HRESULT write(xls_t * const xls, int _r, int _c, std::string str);
 	HRESULT write(xls_t * const xls, int _r, int _c, std::wstring wstr);
 	HRESULT write(xls_t * const xls, int _r, int _c, char* char_str);
 	HRESULT write(xls_t * const xls, int _r, int _c, wchar_t* wchar_str);
+	static HRESULT write_in_table(xls_t * const xls, int _r, int _c, VARIANT *value);
 
 	int get_font_color(VARIANT ws, int _r, int _c);
 	HRESULT get_font_color(VARIANT ws, int _r, int _c, int *color_value);

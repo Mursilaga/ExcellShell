@@ -15,11 +15,17 @@ int main()
 	wchar_t *wchar_str = L"wchar_t";
 	std::string str = "string";
 	std::wstring wstr = L"wstring";
+	int int_value = 42;
+	float f_value = 3.14;
+	double dbl_value = 3.14159;
 
 	hr = write(xls, 1, xlsh::B_COLUMN, char_str);
 	hr = write(xls, 1, xlsh::C_COLUMN, wchar_str);
 	hr = write(xls, 1, xlsh::D_COLUMN, str);
 	hr = write(xls, 1, xlsh::E_COLUMN, wstr);
+	hr = write(xls, 1, xlsh::F_COLUMN, int_value);
+	hr = write(xls, 1, xlsh::G_COLUMN, f_value);
+	hr = write(xls, 1, xlsh::H_COLUMN, dbl_value);
 
 	//set bold in B1 cell. For italic is similar 
 	hr = xlsh::set_bold(xls->ws, 1, xlsh::B_COLUMN, true);
