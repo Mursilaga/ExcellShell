@@ -65,41 +65,41 @@ namespace xlsh
 
 	HRESULT activate_sheet(xls_t * const xls, int sheetnum);
 
-	HRESULT read(VARIANT ws, int _r, int _c, std::wstring * const _x);
-	HRESULT read_formula(VARIANT ws, int _r, int _c, std::wstring * const _x);
-	int read_int(VARIANT ws, int _r, int _c);
+	HRESULT read(VARIANT ws, int row, int column, std::wstring * const _x);
+	HRESULT read_formula(VARIANT ws, int row, int column, std::wstring * const _x);
+	int read_int(VARIANT ws, int row, int column);
 
-	HRESULT write(xls_t * const xls, int _r, int _c, int value);
-	HRESULT write(xls_t * const xls, int _r, int _c, float value);
-	HRESULT write(xls_t * const xls, int _r, int _c, double value);
-	HRESULT write(xls_t * const xls, int _r, int _c, std::string str);
-	HRESULT write(xls_t * const xls, int _r, int _c, std::wstring wstr);
-	HRESULT write(xls_t * const xls, int _r, int _c, char* char_str);
-	HRESULT write(xls_t * const xls, int _r, int _c, wchar_t* wchar_str);
-	static HRESULT write_in_table(xls_t * const xls, int _r, int _c, VARIANT *value);
+	HRESULT write(xls_t * const xls, int row, int column, int value);
+	HRESULT write(xls_t * const xls, int row, int column, float value);
+	HRESULT write(xls_t * const xls, int row, int column, double value);
+	HRESULT write(xls_t * const xls, int row, int column, std::string str);
+	HRESULT write(xls_t * const xls, int row, int column, std::wstring wstr);
+	HRESULT write(xls_t * const xls, int row, int column, char* char_str);
+	HRESULT write(xls_t * const xls, int row, int column, wchar_t* wchar_str);
+	static HRESULT write_in_table(xls_t * const xls, int row, int column, VARIANT *value);
 
-	int get_font_color(VARIANT ws, int _r, int _c);
-	HRESULT get_font_color(VARIANT ws, int _r, int _c, int *color_value);
-	HRESULT set_font_color(VARIANT ws, int _r, int _c, const int color_value);
-	HRESULT set_font_color_range(xls_t * const xls, int r_since, int c_since, int r_before, int c_before, const int color_value);
+	int get_font_color(VARIANT ws, int row, int column);
+	HRESULT get_font_color(VARIANT ws, int row, int column, int *color_value);
+	HRESULT set_font_color(VARIANT ws, int row, int column, const int color_value);
+	HRESULT set_font_color_range(xls_t * const xls, int row_since, int column_since, int row_before, int column_before, const int color_value);
 
-	int get_inter_color(VARIANT ws, int _r, int _c);
-	HRESULT get_inter_color(VARIANT ws, int _r, int _c, int *color_value);
-	HRESULT set_inter_color(VARIANT ws, int _r, int _c, const int color_value);
-	HRESULT set_inter_color_range(xls_t * const xls, int r_since, int c_since, int r_before, int c_before, const int color_value);
+	int get_inter_color(VARIANT ws, int row, int column);
+	HRESULT get_inter_color(VARIANT ws, int row, int column, int *color_value);
+	HRESULT set_inter_color(VARIANT ws, int row, int column, const int color_value);
+	HRESULT set_inter_color_range(xls_t * const xls, int r_since, int c_since, int row_before, int column_before, const int color_value);
 
-	bool get_italic(VARIANT ws, int _r, int _c);
-	HRESULT get_italic(VARIANT ws, int _r, int _c, bool* state);
-	HRESULT set_italic(VARIANT ws, int _r, int _c, bool state);
-	HRESULT set_italic_range(xls_t * const xls, int r_since, int c_since, int r_before, int c_before, bool state);
+	bool get_italic(VARIANT ws, int row, int column);
+	HRESULT get_italic(VARIANT ws, int row, int column, bool* state);
+	HRESULT set_italic(VARIANT ws, int row, int column, bool state);
+	HRESULT set_italic_range(xls_t * const xls, int row_since, int column_since, int row_before, int column_before, bool state);
 
-	bool get_bold(VARIANT ws, int _r, int _c);
-	HRESULT get_bold(VARIANT ws, int _r, int _c, bool* state);
-	HRESULT set_bold(VARIANT ws, int _r, int _c, bool state);
-	HRESULT set_bold_range(xls_t * const xls, int r_since, int c_since, int r_before, int c_before, bool state);
+	bool get_bold(VARIANT ws, int row, int column);
+	HRESULT get_bold(VARIANT ws, int row, int column, bool* state);
+	HRESULT set_bold(VARIANT ws, int row, int column, bool state);
+	HRESULT set_bold_range(xls_t * const xls, int row_since, int column_since, int row_before, int column_before, bool state);
 
-	std::wstring get_cell(int r, int c);
+	std::wstring get_cell(int row, int column);
 
-	void erase_range(xls_t * const xls, int r_since, int c_since, int r_before, int c_before);
+	void erase_range(xls_t * const xls, int row_since, int column_since, int row_before, int column_before);
 
 }

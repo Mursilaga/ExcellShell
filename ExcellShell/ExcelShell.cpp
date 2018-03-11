@@ -271,7 +271,7 @@ namespace xlsh
 		return res;
 	}
 
-	HRESULT read(VARIANT ws, int _r, int _c, std::wstring * const _x)
+	HRESULT read(VARIANT ws, int row, int column, std::wstring * const _x)
 	{
 		HRESULT hr;
 
@@ -287,8 +287,8 @@ namespace xlsh
 
 		while (true)
 		{
-			r.lVal = _r;
-			c.lVal = _c;
+			r.lVal = row;
+			c.lVal = column;
 			BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &cell, ws.pdispVal, L"Cells", 2, c, r))
 
 				BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &x, cell.pdispVal, L"Value", 0))
@@ -337,59 +337,59 @@ namespace xlsh
 		return cell_int;
 	}
 
-	HRESULT write(xls_t * const xls, int _r, int _c, int value)
+	HRESULT write(xls_t * const xls, int row, int column, int value)
 	{
 		VARIANT tmp;
 		tmp.vt = VT_INT;
 		tmp.intVal = value;
-		return write_in_table(xls, _r, _c, &tmp);
+		return write_in_table(xls, row, column, &tmp);
 	}
 
-	HRESULT write(xls_t * const xls, int _r, int _c, float value)
+	HRESULT write(xls_t * const xls, int row, int column, float value)
 	{
 		VARIANT tmp;
 		tmp.vt = VT_R4;
 		tmp.fltVal = value;
-		return write_in_table(xls, _r, _c, &tmp);
+		return write_in_table(xls, row, column, &tmp);
 	}
 
-	HRESULT write(xls_t * const xls, int _r, int _c, double value)
+	HRESULT write(xls_t * const xls, int row, int column, double value)
 	{
 		VARIANT tmp;
 		tmp.vt = VT_R8;
 		tmp.dblVal = value;
-		return write_in_table(xls, _r, _c, &tmp);
+		return write_in_table(xls, row, column, &tmp);
 	}
 
-	HRESULT write(xls_t * const xls, int _r, int _c, char* char_str)
+	HRESULT write(xls_t * const xls, int row, int column, char* char_str)
 	{
 		const size_t size = strlen(char_str) + 1;
 		wchar_t* wchar_str = new wchar_t[size];
 		mbstowcs(wchar_str, char_str, size);
-		return write(xls, _r, _c, wchar_str);
+		return write(xls, row, column, wchar_str);
 	}
 
-	HRESULT write(xls_t * const xls, int _r, int _c, std::string str)
+	HRESULT write(xls_t * const xls, int row, int column, std::string str)
 	{
-		return write(xls, _r, _c, std::wstring(str.begin(), str.end()));
+		return write(xls, row, column, std::wstring(str.begin(), str.end()));
 	}
 
-	HRESULT write(xls_t * const xls, int _r, int _c, std::wstring wstr)
+	HRESULT write(xls_t * const xls, int row, int column, std::wstring wstr)
 	{
 		wchar_t *wchar_str = (wchar_t *)wstr.c_str();
-		return write(xls, _r, _c, wchar_str);
+		return write(xls, row, column, wchar_str);
 	}
 
-	HRESULT write(xls_t * const xls, int _r, int _c, wchar_t* wchar_str)
+	HRESULT write(xls_t * const xls, int row, int column, wchar_t* wchar_str)
 	{
 		VARIANT tmp;
 		tmp.vt = VT_BSTR;
 		tmp.bstrVal = ::SysAllocString(wchar_str);
 
-		return write_in_table(xls, _r, _c, &tmp);
+		return write_in_table(xls, row, column, &tmp);
 	}
 
-	static HRESULT write_in_table(xls_t * const xls, int _r, int _c, VARIANT *value)
+	static HRESULT write_in_table(xls_t * const xls, int row, int column, VARIANT *value)
 	{
 		HRESULT hr = NULL;
 		VariantInit(&xls->app);
@@ -406,7 +406,7 @@ namespace xlsh
 
 			IDispatch *pXlRange;
 			{
-				std::wstring cell = get_cell(_r, _c);
+				std::wstring cell = get_cell(row, column);
 				VARIANT parm;
 				parm.vt = VT_BSTR;
 				parm.bstrVal = ::SysAllocString(cell.c_str());
@@ -425,24 +425,24 @@ namespace xlsh
 		return hr;
 	}
 
-	std::wstring get_cell(int r, int c)
+	std::wstring get_cell(int row, int column)
 	{
 		std::wstring symb_for_excel[MAX_COLUMN + 1] = { L"", L"a", L"b", L"c", L"d", L"e", L"f", L"g", L"h", L"i", L"j", L"k", L"l", L"m", L"n", L"o", L"p", L"q", L"r", L"s", L"t", L"u", L"v", L"w", L"x", L"y", L"z", L"aa", L"ab", L"ac", L"ad", L"ae", L"af", L"ag", L"ah", L"ai", L"aj", L"ak", L"al", L"am", L"an" };
 
-		std::wstring res = symb_for_excel[c];
-		res += std::to_wstring(r);
+		std::wstring res = symb_for_excel[column];
+		res += std::to_wstring(row);
 		return res;
 	}
 
-	int get_font_color(VARIANT ws, int _r, int _c)
+	int get_font_color(VARIANT ws, int row, int column)
 	{
 		int color;
 		HRESULT hr;
-		hr = get_font_color(ws, _r, _c, &color);
+		hr = get_font_color(ws, row, column, &color);
 		return color;
 	}
 
-	HRESULT get_font_color(VARIANT ws, int _r, int _c, int *color_value)
+	HRESULT get_font_color(VARIANT ws, int row, int column, int *color_value)
 	{
 		HRESULT hr;
 
@@ -460,8 +460,8 @@ namespace xlsh
 
 		while (true)
 		{
-			r.lVal = _r;
-			c.lVal = _c;
+			r.lVal = row;
+			c.lVal = column;
 			BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &cell, ws.pdispVal, L"Cells", 2, c, r))
 				BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &in, cell.pdispVal, L"Font", 0))
 				BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &color, in.pdispVal, L"Color", 0))
@@ -475,7 +475,7 @@ namespace xlsh
 		return hr;
 	}
 
-	HRESULT set_font_color(VARIANT ws, int _r, int _c, const int color_value)
+	HRESULT set_font_color(VARIANT ws, int row, int column, const int color_value)
 	{
 		HRESULT hr;
 
@@ -494,8 +494,8 @@ namespace xlsh
 
 		while (true)
 		{
-			r.lVal = _r;
-			c.lVal = _c;
+			r.lVal = row;
+			c.lVal = column;
 			BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &cell, ws.pdispVal, L"Cells", 2, c, r))
 				BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &in, cell.pdispVal, L"Font", 0))
 				BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYPUT, 0, in.pdispVal, L"Color", 1, color))
@@ -558,15 +558,15 @@ namespace xlsh
 		return hr;
 	}
 
-	int get_inter_color(VARIANT ws, int _r, int _c)
+	int get_inter_color(VARIANT ws, int row, int column)
 	{
 		int color;
 		HRESULT hr;
-		hr = get_inter_color(ws, _r, _c, &color);
+		hr = get_inter_color(ws, row, column, &color);
 		return color;
 	}
 
-	HRESULT get_inter_color(VARIANT ws, int _r, int _c, int *color_value)
+	HRESULT get_inter_color(VARIANT ws, int row, int column, int *color_value)
 	{
 		HRESULT hr;
 
@@ -584,8 +584,8 @@ namespace xlsh
 
 		while (true)
 		{
-			r.lVal = _r;
-			c.lVal = _c;
+			r.lVal = row;
+			c.lVal = column;
 			BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &cell, ws.pdispVal, L"Cells", 2, c, r))
 				BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &in, cell.pdispVal, L"Interior", 0))
 				BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &color, in.pdispVal, L"Color", 0))
@@ -599,7 +599,7 @@ namespace xlsh
 		return hr;
 	}
 
-	HRESULT set_inter_color(VARIANT ws, int _r, int _c, const int color_value)
+	HRESULT set_inter_color(VARIANT ws, int row, int column, const int color_value)
 	{
 		HRESULT hr;
 
@@ -618,8 +618,8 @@ namespace xlsh
 
 		while (true)
 		{
-			r.lVal = _r;
-			c.lVal = _c;
+			r.lVal = row;
+			c.lVal = column;
 			BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &cell, ws.pdispVal, L"Cells", 2, c, r))
 				BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &in, cell.pdispVal, L"Interior", 0))
 				BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYPUT, 0, in.pdispVal, L"Color", 1, color))
@@ -681,15 +681,15 @@ namespace xlsh
 		return hr;
 	}
 
-	bool get_italic(VARIANT ws, int _r, int _c)
+	bool get_italic(VARIANT ws, int row, int column)
 	{
 		bool state;
 		HRESULT hr;
-		hr = get_italic(ws, _r, _c, &state);
+		hr = get_italic(ws, row, column, &state);
 		return state;
 	}
 
-	HRESULT get_italic(VARIANT ws, int _r, int _c, bool* state)
+	HRESULT get_italic(VARIANT ws, int row, int column, bool* state)
 	{
 		HRESULT hr;
 
@@ -707,8 +707,8 @@ namespace xlsh
 
 		while (true)
 		{
-			r.lVal = _r;
-			c.lVal = _c;
+			r.lVal = row;
+			c.lVal = column;
 			BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &cell, ws.pdispVal, L"Cells", 2, c, r))
 				BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &in, cell.pdispVal, L"Font", 0))
 				BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &italic, in.pdispVal, L"Italic", 0))
@@ -722,7 +722,7 @@ namespace xlsh
 		return hr;
 	}
 
-	HRESULT set_italic(VARIANT ws, int _r, int _c, bool state)
+	HRESULT set_italic(VARIANT ws, int row, int column, bool state)
 	{
 		HRESULT hr;
 
@@ -741,8 +741,8 @@ namespace xlsh
 
 		while (true)
 		{
-			r.lVal = _r;
-			c.lVal = _c;
+			r.lVal = row;
+			c.lVal = column;
 			BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &cell, ws.pdispVal, L"Cells", 2, c, r))
 				BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &in, cell.pdispVal, L"Font", 0))
 				BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYPUT, 0, in.pdispVal, L"Italic", 1, italic))
@@ -805,15 +805,15 @@ namespace xlsh
 		return hr;
 	}
 
-	bool get_bold(VARIANT ws, int _r, int _c)
+	bool get_bold(VARIANT ws, int row, int column)
 	{
 		bool state;
 		HRESULT hr;
-		hr = get_bold(ws, _r, _c, &state);
+		hr = get_bold(ws, row, column, &state);
 		return state;
 	}
 
-	HRESULT get_bold(VARIANT ws, int _r, int _c, bool* state)
+	HRESULT get_bold(VARIANT ws, int row, int column, bool* state)
 	{
 		HRESULT hr;
 
@@ -831,8 +831,8 @@ namespace xlsh
 
 		while (true)
 		{
-			r.lVal = _r;
-			c.lVal = _c;
+			r.lVal = row;
+			c.lVal = column;
 			BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &cell, ws.pdispVal, L"Cells", 2, c, r))
 				BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &in, cell.pdispVal, L"Font", 0))
 				BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &bold, in.pdispVal, L"Bold", 0))
@@ -846,7 +846,7 @@ namespace xlsh
 		return hr;
 	}
 
-	HRESULT set_bold(VARIANT ws, int _r, int _c, bool state)
+	HRESULT set_bold(VARIANT ws, int row, int column, bool state)
 	{
 		HRESULT hr;
 
@@ -865,8 +865,8 @@ namespace xlsh
 
 		while (true)
 		{
-			r.lVal = _r;
-			c.lVal = _c;
+			r.lVal = row;
+			c.lVal = column;
 			BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &cell, ws.pdispVal, L"Cells", 2, c, r))
 				BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &in, cell.pdispVal, L"Font", 0))
 				BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYPUT, 0, in.pdispVal, L"Bold", 1, bold))
@@ -980,7 +980,7 @@ namespace xlsh
 		}
 	}
 
-	HRESULT read_formula(VARIANT ws, int _r, int _c, std::wstring * const _x)
+	HRESULT read_formula(VARIANT ws, int row, int column, std::wstring * const _x)
 	{
 		HRESULT hr;
 
@@ -996,8 +996,8 @@ namespace xlsh
 
 		while (true)
 		{
-			r.lVal = _r;
-			c.lVal = _c;
+			r.lVal = row;
+			c.lVal = column;
 			BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &cell, ws.pdispVal, L"Cells", 2, c, r))
 
 				BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &x, cell.pdispVal, L"Formula", 0))
