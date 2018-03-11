@@ -337,6 +337,15 @@ namespace xlsh
 		return cell_int;
 	}
 
+	HRESULT write(xls_t * const xls, int _r, int _c, double value)
+	{
+		VARIANT tmp;
+		tmp.vt = VT_R8;
+		tmp.dblVal = value;
+
+		return write_in_table(xls, _r, _c, &tmp);
+	}
+
 	HRESULT write(xls_t * const xls, int _r, int _c, char* char_str)
 	{
 		const size_t size = strlen(char_str) + 1;
@@ -358,13 +367,17 @@ namespace xlsh
 
 	HRESULT write(xls_t * const xls, int _r, int _c, wchar_t* wchar_str)
 	{
-		HRESULT hr = NULL;
-
-		VariantInit(&xls->app);
-
 		VARIANT tmp;
 		tmp.vt = VT_BSTR;
 		tmp.bstrVal = ::SysAllocString(wchar_str);
+
+		return write_in_table(xls, _r, _c, &tmp);
+	}
+
+	static HRESULT write_in_table(xls_t * const xls, int _r, int _c, VARIANT *value)
+	{
+		HRESULT hr = NULL;
+		VariantInit(&xls->app);
 
 		while (true)
 		{
@@ -391,8 +404,8 @@ namespace xlsh
 				pXlRange = result.pdispVal;
 			}
 
-			BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYPUT, NULL, pXlRange, L"Value", 1, tmp))
-				break;
+			BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYPUT, NULL, pXlRange, L"Value", 1, value))
+			break;
 		}
 		return hr;
 	}
