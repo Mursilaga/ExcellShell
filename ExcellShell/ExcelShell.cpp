@@ -427,9 +427,13 @@ namespace xlsh
 
 	std::wstring get_cell(int row, int column)
 	{
-		std::wstring symb_for_excel[MAX_COLUMN + 1] = { L"", L"a", L"b", L"c", L"d", L"e", L"f", L"g", L"h", L"i", L"j", L"k", L"l", L"m", L"n", L"o", L"p", L"q", L"r", L"s", L"t", L"u", L"v", L"w", L"x", L"y", L"z", L"aa", L"ab", L"ac", L"ad", L"ae", L"af", L"ag", L"ah", L"ai", L"aj", L"ak", L"al", L"am", L"an" };
-
-		std::wstring res = symb_for_excel[column];
+		std::wstring symb_for_excel[26] = { L"a", L"b", L"c", L"d", L"e", L"f", L"g", L"h", L"i", L"j", L"k", L"l", L"m", L"n", L"o", L"p", L"q", L"r", L"s", L"t", L"u", L"v", L"w", L"x", L"y", L"z" };
+		std::wstring res;
+		do
+		{
+			res = symb_for_excel[(column-1) % 26] + res;
+		} while (--column /= 26);
+		
 		res += std::to_wstring(row);
 		return res;
 	}
@@ -499,7 +503,7 @@ namespace xlsh
 			BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &cell, ws.pdispVal, L"Cells", 2, c, r))
 				BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &in, cell.pdispVal, L"Font", 0))
 				BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYPUT, 0, in.pdispVal, L"Color", 1, color))
-				break;
+			break;
 		}
 
 		VariantClear(&cell);
