@@ -69,6 +69,8 @@ namespace xlsh
 	HRESULT read_formula(VARIANT ws, int _r, int _c, std::wstring * const _x);
 	int read_int(VARIANT ws, int _r, int _c);
 
+	HRESULT write(xls_t * const xls, int _r, int _c, int value);
+	HRESULT write(xls_t * const xls, int _r, int _c, float value);
 	HRESULT write(xls_t * const xls, int _r, int _c, double value);
 	HRESULT write(xls_t * const xls, int _r, int _c, std::string str);
 	HRESULT write(xls_t * const xls, int _r, int _c, std::wstring wstr);

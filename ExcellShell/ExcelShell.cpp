@@ -337,12 +337,27 @@ namespace xlsh
 		return cell_int;
 	}
 
+	HRESULT write(xls_t * const xls, int _r, int _c, int value)
+	{
+		VARIANT tmp;
+		tmp.vt = VT_INT;
+		tmp.intVal = value;
+		return write_in_table(xls, _r, _c, &tmp);
+	}
+
+	HRESULT write(xls_t * const xls, int _r, int _c, float value)
+	{
+		VARIANT tmp;
+		tmp.vt = VT_R4;
+		tmp.fltVal = value;
+		return write_in_table(xls, _r, _c, &tmp);
+	}
+
 	HRESULT write(xls_t * const xls, int _r, int _c, double value)
 	{
 		VARIANT tmp;
 		tmp.vt = VT_R8;
 		tmp.dblVal = value;
-
 		return write_in_table(xls, _r, _c, &tmp);
 	}
 
