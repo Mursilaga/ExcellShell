@@ -63,8 +63,9 @@ namespace xlsh
 
 	HRESULT activate_sheet(xls_t * const xls, int sheetnum);
 
-	HRESULT read(VARIANT ws, int row, int column, std::wstring * const _x);
-	HRESULT read_formula(VARIANT ws, int row, int column, std::wstring * const _x);
+	HRESULT read(VARIANT ws, int row, int column, std::wstring *wstr);
+	HRESULT read(VARIANT ws, int row, int column, std::string *str);
+	HRESULT read_formula(VARIANT ws, int row, int column, std::wstring *wstr);
 	int read_int(VARIANT ws, int row, int column);
 
 	HRESULT write(xls_t * const xls, int row, int column, int value);

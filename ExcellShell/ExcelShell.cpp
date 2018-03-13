@@ -271,7 +271,7 @@ namespace xlsh
 		return res;
 	}
 
-	HRESULT read(VARIANT ws, int row, int column, std::wstring * const _x)
+	HRESULT read(VARIANT ws, int row, int column, std::wstring *value)
 	{
 		HRESULT hr;
 
@@ -294,7 +294,7 @@ namespace xlsh
 				BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &x, cell.pdispVal, L"Value", 0))
 				if (x.vt == VT_BSTR)
 				{
-					*_x = x.bstrVal;
+					*value = x.bstrVal;
 				}
 				else
 				{
@@ -303,12 +303,12 @@ namespace xlsh
 
 					if (SUCCEEDED(VariantChangeType(&tmp, &x, 0, VT_BSTR)))
 					{
-						*_x = tmp.bstrVal;
+						*value = tmp.bstrVal;
 						VariantClear(&tmp);
 					}
 					else
 					{
-						_x->clear();
+						value->clear();
 					}
 				}
 
@@ -318,6 +318,14 @@ namespace xlsh
 		VariantClear(&cell);
 		VariantClear(&x);
 
+		return hr;
+	}
+
+	HRESULT read(VARIANT ws, int row, int column, std::string *str)
+	{
+		std::wstring wstr;
+		HRESULT hr = read(ws, row, column, &wstr);
+		*str = std::string(wstr.begin(), wstr.end());
 		return hr;
 	}
 
@@ -984,7 +992,7 @@ namespace xlsh
 		}
 	}
 
-	HRESULT read_formula(VARIANT ws, int row, int column, std::wstring * const _x)
+	HRESULT read_formula(VARIANT ws, int row, int column, std::wstring *wstr)
 	{
 		HRESULT hr;
 
@@ -1007,7 +1015,7 @@ namespace xlsh
 				BREAK_ON_FAIL(AutoWrap(DISPATCH_PROPERTYGET, &x, cell.pdispVal, L"Formula", 0))
 				if (x.vt == VT_BSTR)
 				{
-					*_x = x.bstrVal;
+					*wstr = x.bstrVal;
 				}
 				else
 				{
@@ -1016,12 +1024,12 @@ namespace xlsh
 
 					if (SUCCEEDED(VariantChangeType(&tmp, &x, 0, VT_BSTR)))
 					{
-						*_x = tmp.bstrVal;
+						*wstr = tmp.bstrVal;
 						VariantClear(&tmp);
 					}
 					else
 					{
-						_x->clear();
+						wstr->clear();
 					}
 				}
 			break;

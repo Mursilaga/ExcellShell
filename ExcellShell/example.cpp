@@ -27,13 +27,11 @@ int main()
 	//hr = write(xls, 1, xlsh::G_COLUMN, f_value);
 	//hr = write(xls, 1, xlsh::H_COLUMN, dbl_value);
 
-	for (int k = 1; k < 20; ++k)
+	for (int i = 1; i < 160; ++i)
 	{
-		for (int i = 1; i < 160; ++i)
-		{
-			hr = write(xls, k, i, xlsh::get_cell(k, i));
-		}
+		hr = write(xls, 2, i, xlsh::get_cell(2, i));
 	}
+
 	//set bold in B1 cell. For italic is similar 
 	hr = xlsh::set_bold(xls->ws, 1, xlsh::B_COLUMN, true);
 	//set bold in range of cells
@@ -58,6 +56,12 @@ int main()
 	//or if you don't worry about hresult ret code
 	interiorColor = xlsh::get_inter_color(xls->ws, 5, xlsh::A_COLUMN);
 	std::cout << "interior color in A5 is " << interiorColor << std::endl;
+
+	hr = xlsh::read(xls->ws, 1, xlsh::E_COLUMN, &wstr);
+	hr = xlsh::write(xls, 3, xlsh::E_COLUMN, wstr);
+
+	hr = xlsh::read(xls->ws, 1, xlsh::D_COLUMN, &str);
+	hr = xlsh::write(xls, 3, xlsh::D_COLUMN, str);
 
 	int a;
 	std::cin >> a; //pause for check results, before excel process will finished
