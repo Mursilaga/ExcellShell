@@ -106,7 +106,6 @@ namespace xlsh
 		{
 			//	std::cout << "try to open document" << std::endl;
 			_path.vt = VT_BSTR;
-			//_path.bstrVal = SysAllocString(str_to_wstr(path).c_str());
 			_path.bstrVal = SysAllocString(path.c_str());
 			hr = AutoWrap(DISPATCH_METHOD, &xls->wb, xls->wbs.pdispVal, L"Open", 1, _path);
 			if (FAILED(hr))
@@ -203,72 +202,6 @@ namespace xlsh
 			break;
 		}
 		return hr;
-	}
-
-	std::wstring str_to_wstr(const std::string &s, const unsigned cp)
-	{
-		std::wstring res;
-		unsigned length =
-			MultiByteToWideChar
-			(
-				cp, //CodePage
-				0, //dwFlags
-				s.c_str(), //lpMultiByteStr
-				-1, //cchMultiByte
-				0, //lpWideCharStr
-				0 //cchWideChar
-			);
-		wchar_t *buffer = new wchar_t[length];
-		if
-			(
-				MultiByteToWideChar
-				(
-					cp, //CodePage
-					0, //dwFlags
-					s.c_str(), //lpMultiByteStr
-					-1, //cchMultiByte
-					buffer, //lpWideCharStr
-					length //cchWideChar
-				)
-				)
-			res = buffer;
-		delete[] buffer;
-		return res;
-	}
-
-	std::string wstr_to_str(const std::wstring &s, const unsigned cp)
-	{
-		std::string res;
-		unsigned length =
-			WideCharToMultiByte
-			(
-				cp, //CodePage
-				0, //dwFlags
-				s.c_str(), //lpWideCharStr
-				-1, //cchWideChar
-				0, //lpMultiByteStr
-				0, //cchMultiByte
-				0, //lpDefaultChar
-				0 //lpUsedDefaultChar
-			);
-		char *buffer = new char[length];
-		if
-			(
-				WideCharToMultiByte
-				(
-					cp, //CodePage
-					0, //dwFlags
-					s.c_str(), //lpWideCharStr
-					-1, //cchWideChar
-					buffer, //lpMultiByteStr
-					length, //cchMultiByte
-					0, //lpDefaultChar
-					0 //lpUsedDefaultChar
-				)
-				)
-			res = buffer;
-		delete[] buffer;
-		return res;
 	}
 
 	HRESULT read(VARIANT ws, int row, int column, std::wstring * const _x)
